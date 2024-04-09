@@ -181,8 +181,7 @@ class JetpackJoyride:
     
 
     def draw_pause(self):
-        pygame.draw.rect(self.surface, (128, 128, 128, 150), [0, 0, self.WIDTH, self.HEIGHT])
-        #pygame.draw.rect(self.surface, "dark gray", [200, 150, 600, 50], 0, 10)
+        pygame.draw.rect(self.surface, (10, 10, 10, 180), [0, 0, self.WIDTH, self.HEIGHT])
 
         text_surface = self.logo_font.render("NITZAJET", True, "white")
         text_rect = text_surface.get_rect(center=(self.WIDTH / 2.05, self.HEIGHT / 3))
@@ -197,14 +196,6 @@ class JetpackJoyride:
         text_surface = self.font.render("Quit", True, "black")
         text_rect = text_surface.get_rect(center=quit_btn.center)
         self.surface.blit(text_surface, text_rect)
-
-        """
-        pygame.draw.rect(self.surface, "dark gray", [200, 300, 600, 50], 0, 10)
-
-        text_surface = self.font.render(f"Lifetime Distance Ran: {int(self.lifetime)}", True, "black")
-        text_rect = text_surface.get_rect(center=(self.WIDTH / 2, 325))
-        self.surface.blit(text_surface, text_rect)
-        """
 
         self.screen.blit(self.surface, (0, 0))
 
