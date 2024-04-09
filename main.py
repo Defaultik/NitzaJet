@@ -18,6 +18,12 @@ class JetpackJoyride:
         self.font = pygame.font.Font("freesansbold.ttf", 32)
 
         self.bg_color = (128, 128, 128)
+        self.bg_image = pygame.image.load("assets/backgrounds/1.jpg")
+
+        self.rocket_image = pygame.image.load("assets/rocket.png")
+        self.rocket_image = pygame.transform.scale(self.rocket_image, (130, 100))
+        self.rocket_image = pygame.transform.rotate(self.rocket_image, 90)
+
         self.lines = [0, self.WIDTH / 4, 2 * self.WIDTH / 4, 3 * self.WIDTH / 4]
         self.game_speed = 4
         self.pause = False
@@ -68,9 +74,8 @@ class JetpackJoyride:
 
     def draw_screen(self):
         self.screen.fill("black")
+        self.screen.blit(self.bg_image, (0, 0))
 
-        pygame.draw.rect(self.surface, (self.bg_color[0], self.bg_color[1], self.bg_color[2], 50), [0, 0, self.WIDTH, self.HEIGHT])
-        self.screen.blit(self.surface, (0, 0))
         top = pygame.draw.rect(self.screen, "gray", [0, 0, self.WIDTH, 50])
         bot = pygame.draw.rect(self.screen, "gray", [0, self.HEIGHT - 50, self.WIDTH, 50])
 
@@ -164,20 +169,25 @@ class JetpackJoyride:
     
     def draw_rocket(self, coords, mode):
         if mode == 0:
-            rock = pygame.draw.rect(self.screen, "dark red", [coords[0] - 60, coords[1] - 25, 50, 50], 0, 5)
-            self.screen.blit(self.font.render("!", True, "black"), (coords[0] - 40, coords[1] - 20))
+            warning = pygame.draw.rect(self.screen, "crimson", [coords[0] - 60, coords[1] - 25, 50, 50], 0, 5)
+            text_surface = self.font.render("!", True, "white")
+            text_rect = text_surface.get_rect(center=warning.center)
+            self.screen.blit(text_surface, text_rect)
+
             if not self.pause:
                 if coords[1] > self.player_y + 10:
                     coords[1] -= 3
                 else:
                     coords[1] += 3
         else:
-            rock = pygame.draw.rect(self.screen, "red", [coords[0], coords[1] - 10, 50, 20], 0, 5)
-            pygame.draw.ellipse(self.screen, "orange", [coords[0] + 50, coords[1] - 10, 50, 20], 7)
+            warning = self.screen.blit(self.rocket_image, (coords[0], coords[1] - 10))
+            #warning = pygame.draw.rect(self.screen, "red", [coords[0], coords[1] - 10, 50, 20], 0, 5)
+            #pygame.draw.ellipse(self.screen, "orange", [coords[0] + 50, coords[1] - 10, 50, 20], 7)
+
             if not self.pause:
                 coords[0] -= 10 + self.game_speed
 
-        return coords, rock
+        return coords, warning
     
 
     def draw_pause(self):
@@ -302,9 +312,9 @@ class JetpackJoyride:
             if self.laser[0][0] < 0 and self.laser[1][0] < 0:
                 self.new_laser = True
 
-            if self.distance - self.new_bg > 500:
+            if self.distance - self.new_bg > 1000:
                 self.new_bg = self.distance
-                self.bg_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                self.bg_image = pygame.image.load("assets/backgrounds/" + str(random.randint(2, 6)) + ".jpg")
 
             if self.restart_cmd:
                 self.modify_player_info()
