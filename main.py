@@ -14,7 +14,9 @@ class JetpackJoyride:
         self.fps = 60
         self.timer = pygame.time.Clock()
 
+        self.logo_font = pygame.font.Font("freesansbold.ttf", 40)
         self.font = pygame.font.Font("freesansbold.ttf", 32)
+
         self.bg_color = (128, 128, 128)
         self.lines = [0, self.WIDTH / 4, 2 * self.WIDTH / 4, 3 * self.WIDTH / 4]
         self.game_speed = 4
@@ -180,18 +182,30 @@ class JetpackJoyride:
 
     def draw_pause(self):
         pygame.draw.rect(self.surface, (128, 128, 128, 150), [0, 0, self.WIDTH, self.HEIGHT])
-        pygame.draw.rect(self.surface, "dark gray", [200, 150, 600, 50], 0, 10)
+        #pygame.draw.rect(self.surface, "dark gray", [200, 150, 600, 50], 0, 10)
 
-        self.surface.blit(self.font.render("Game Pause", True, "black"), (self.WIDTH / 2, self.HEIGHT / 3))
-        restart_btn = pygame.draw.rect(self.surface, "white", [200, 220, 280, 50], 0, 10)
+        text_surface = self.logo_font.render("NITZAJET", True, "white")
+        text_rect = text_surface.get_rect(center=(self.WIDTH / 2.05, self.HEIGHT / 3))
+        self.surface.blit(text_surface, text_rect)
 
-        self.surface.blit(self.font.render("Restart", True, "black"), (220, 230))
-        quit_btn = pygame.draw.rect(self.surface, "white", [520, 220, 280, 50], 0, 10)
+        restart_btn = pygame.draw.rect(self.surface, "white", [self.WIDTH / 2.5, text_rect.y + 50, 270, 45], 0, 100)
+        text_surface = self.font.render("Restart", True, "black")
+        text_rect = text_surface.get_rect(center=restart_btn.center)
+        self.surface.blit(text_surface, text_rect)
 
-        self.surface.blit(self.font.render("Quit", True, "black"), (540, 230))
+        quit_btn = pygame.draw.rect(self.surface, "white", [self.WIDTH / 2.5, restart_btn.y + 60, 270, 45], 0, 100)
+        text_surface = self.font.render("Quit", True, "black")
+        text_rect = text_surface.get_rect(center=quit_btn.center)
+        self.surface.blit(text_surface, text_rect)
+
+        """
         pygame.draw.rect(self.surface, "dark gray", [200, 300, 600, 50], 0, 10)
 
-        self.surface.blit(self.font.render(f"Lifetime Distance Ran: {int(self.lifetime)}", True, "black"), (220, 310))
+        text_surface = self.font.render(f"Lifetime Distance Ran: {int(self.lifetime)}", True, "black")
+        text_rect = text_surface.get_rect(center=(self.WIDTH / 2, 325))
+        self.surface.blit(text_surface, text_rect)
+        """
+
         self.screen.blit(self.surface, (0, 0))
 
         return restart_btn, quit_btn
