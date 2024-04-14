@@ -37,6 +37,8 @@ class Game:
         self.player_on_ground = True
         self.player_alive = True
 
+        self.player_distance = 0
+
 
         # ROCKET
         self.rocket_active = False
@@ -60,6 +62,7 @@ class Game:
         self.bg_image = "assets/images/backgrounds/1.jpg"
 
         self.game_image = pygame.image.load(self.bg_image)
+        self.game_image = pygame.transform.scale(self.game_image, (self.WIDTH, self.HEIGHT))
 
         # Blur background image
         byte_stream = io.BytesIO()
@@ -142,6 +145,8 @@ class Game:
                     self.screen.blit(self.player_image_move_1, (self.player_x, self.player_y))
                 else:
                     self.screen.blit(self.player_image_move_2, (self.player_x, self.player_y))
+
+            self.player_distance += self.game_speed
 
 
     # GAME
