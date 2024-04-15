@@ -19,12 +19,19 @@ class Game:
         self.fonts_init()
         self.images_init()
 
+        pygame.mixer.music.load("assets/sounds/music.mp3")
+        pygame.mixer.music.play(-1)
+
         # MAIN
         self.fps = 60
         self.game_speed = 2
 
+
         # PLAYER
         self.player_counter = 0
+        self.player_distance = 0
+        self.player_bg_distance = 0
+
         self.player_x = 280
 
         self.player_init_y = self.HEIGHT / 1.22
@@ -41,12 +48,18 @@ class Game:
         self.rockets = []  # List to store rockets
         self.rocket_spawn_time = 0
         self.rocket_spawn_interval = random.randint(60, 300)  # Time until first rocket appears
-        self.rocket_warning_counter = 0 
+        self.rocket_warning_counter = 0
+
+        self.rocket_warning_sound = False
+        self.rocket_fly_sound = False
+        self.rocket_explosion_sound = False
+
 
         # LASER
         self.lasers = []
         self.laser_spawn_time = 0
         self.laser_spawn_interval = random.randint(60, 300)  # Time until first laser appears
+
 
         # STATEMENTS
         self.main_menu = True
@@ -62,7 +75,7 @@ class Game:
 
 
     def images_init(self):
-        self.bg_image = "assets/images/backgrounds/1.jpg"
+        self.bg_image = "assets/images/backgrounds/" + str(random.randint(1, 5)) + ".jpg"
 
         self.game_image = pygame.image.load(self.bg_image)
         self.game_image = pygame.transform.scale(self.game_image, (self.WIDTH, self.HEIGHT))
@@ -100,6 +113,9 @@ class Game:
         self.rocket_image = pygame.transform.scale(self.rocket_image, (130, 100))
         self.rocket_image = pygame.transform.rotate(self.rocket_image, 90)
 
+        self.rocket_explosion_image = pygame.image.load("assets/images/explosion/2.png")
+        self.rocket_explosion_image = pygame.transform.scale(self.rocket_explosion_image, (130, 100))
+
     
     # LASER BARRIER
     def draw_laser(self):
@@ -128,6 +144,10 @@ class Game:
     def draw_rocket(self):
         for rocket in self.rockets:
             if rocket["warning"]:
+                if not self.rocket_warning_sound:
+                    self.rocket_warning_sound = True
+                    pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/rocket/launch.mp3"))
+
                 rocket_warning = pygame.draw.rect(self.screen, "crimson", [rocket["x"], rocket["y"], 50, 50], 0, 5)
                 text_surface = self.font_rocket_warning.render("!", True, "white")
                 text_rect = text_surface.get_rect(center=rocket_warning.center)
@@ -139,29 +159,44 @@ class Game:
                     rocket["y"] += 5
 
                 self.rocket_warning_counter += 1
-                if self.rocket_warning_counter >= 60:
+                if self.rocket_warning_counter >= 45:
                     self.rocket_warning_counter = 0
                     rocket["warning"] = False
             else:
-                rocket_warning = self.screen.blit(self.rocket_image, (rocket["x"], rocket["y"]))
-                rocket["x"] -= 20 + self.game_speed
+                if not self.game_over:
+                    if not self.rocket_fly_sound:
+                        self.rocket_fly_sound = True
+                        pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/rocket/fly.mp3"))
+
+                    rocket_warning = self.screen.blit(self.rocket_image, (rocket["x"], rocket["y"]))
+                    rocket["x"] -= 15 + self.game_speed
 
             # Check collision with player
             if rocket["x"] < self.player_x + self.player_image_move_1.get_width() and \
                     rocket["x"] + self.rocket_image.get_width() > self.player_x and \
                     rocket["y"] < self.player_y + self.player_image_move_1.get_height() and \
                     rocket["y"] + self.rocket_image.get_height() > self.player_y:
-                
+
                 self.game_over = True
+
+                rocket_warning = self.screen.blit(self.rocket_explosion_image, (self.player_x + self.player_image_death.get_width() / 4, self.player_y))
+                if not self.rocket_explosion_sound:
+                    self.rocket_explosion_sound = True
+                    pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/rocket/explosion.wav"))
 
             if rocket["x"] <= 0:
                 self.rockets.remove(rocket)
                 del rocket
 
+                self.rocket_warning_sound = False
+                self.rocket_fly_sound = False
+
 
     # PLAYER
     def draw_player(self):
         if not self.game_over:
+            self.player_distance += self.game_speed / 5
+
             if self.player_counter < 10:
                 self.player_counter += 1
             else:
@@ -207,12 +242,23 @@ class Game:
     # GAME
     # Method to draw game map
     def draw_map(self):
+        if self.player_distance - self.player_bg_distance >= 500:
+            self.game_speed += 0.5
+
+            self.player_bg_distance = self.player_distance
+            self.bg_image = "assets/images/backgrounds/" + str(random.randint(1, 5)) + ".jpg"
+            self.images_init()
+            
         self.screen.blit(self.game_image, (0, 0))
 
         # Draw roof and floor
         for x in range(0, self.WIDTH, self.roof_image.get_size()[0]):
             self.roof_surf = self.screen.blit(self.roof_image, (x, 0))
             self.floor_surf = self.screen.blit(self.floor_image, (x, self.HEIGHT / 1.1))
+
+        text_surface = self.font_main.render("Distance: " + str(int(self.player_distance)), True, "white")
+        text_rect = text_surface.get_rect(center=(text_surface.get_width() / 1.5, 30))
+        self.screen.blit(text_surface, text_rect)
 
 
     # Method to draw main menu
@@ -303,10 +349,62 @@ class Game:
         while not quit:
             clock.tick(60)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    quit = True
+            if not self.game_over and not self.pause_menu and not self.main_menu:
+                if self.rocket_spawn_time >= self.rocket_spawn_interval:
+                    self.rockets.append({"x": self.WIDTH - 60, "y": self.HEIGHT / 2, "warning": True})
+                    self.rocket_spawn_time = 0
+                    self.rocket_spawn_interval = random.randint(60, 300)  # Generate new time
+                else:
+                    self.rocket_spawn_time += 1
 
+                if self.laser_spawn_time >= self.laser_spawn_interval:
+                    self.lasers.append({"x": self.WIDTH, "y": random.randint(80, self.HEIGHT - 80), "size": random.randint(90, 120)})
+                    self.laser_spawn_time = 0
+                    self.laser_spawn_interval = random.randint(160, 550)  # Generate new time
+                else:
+                    self.laser_spawn_time += 1
+
+            if self.restart:
+                self.restart = False
+                self.game_over = False
+                self.game_speed = 2
+
+                self.player_y = self.player_init_y
+                self.player_distance = 0
+                self.player_bg_distance = 0
+
+                self.rockets.clear()
+                self.lasers.clear()
+
+                self.rocket_explosion_sound = False
+                self.rocket_warning_sound = False
+                self.rocket_fly_sound = False
+
+            if self.main_menu:
+                btn_start, btn_quit = self.draw_main_menu()
+            elif self.pause_menu:
+                self.draw_map()
+                self.draw_rocket()
+                self.draw_player()
+                self.draw_laser()
+
+                btn_play, btn_restart, btn_quit = self.draw_pause_menu()
+            elif self.game_over:
+                self.draw_map()
+                self.draw_rocket()
+                self.draw_player()
+                self.draw_laser()
+
+                btn_restart, btn_quit = self.draw_game_over_menu()
+            else:
+                self.draw_map()
+                self.draw_rocket()
+                self.draw_player()
+                self.draw_laser()
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE and not self.game_over and not self.main_menu:
                         if self.pause_menu:
@@ -336,58 +434,13 @@ class Game:
                         elif btn_quit.collidepoint(event.pos):
                             quit = True
 
-            if not self.game_over:
-                if self.rocket_spawn_time >= self.rocket_spawn_interval:
-                    self.rockets.append({"x": self.WIDTH - 60, "y": self.HEIGHT / 2, "warning": True})
-                    self.rocket_spawn_time = 0
-                    self.rocket_spawn_interval = random.randint(60, 300)  # Generate new time
-                else:
-                    self.rocket_spawn_time += 1
+                if event.type == pygame.QUIT:
+                     quit = True
 
-                if self.laser_spawn_time >= self.laser_spawn_interval:
-                    self.lasers.append({"x": self.WIDTH, "y": random.randint(80, self.HEIGHT - 80), "size": random.randint(90, 120)})
-                    self.laser_spawn_time = 0
-                    self.laser_spawn_interval = random.randint(160, 550)  # Generate new time
-                else:
-                    self.laser_spawn_time += 1
+        pygame.mixer.music.stop()
+        pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/ui/quit.ogg"))
 
-            if self.restart:
-                self.restart = False
-                self.game_over = False
-                self.game_speed = 2
-
-                self.player_y = self.player_init_y
-
-                self.rockets.clear()
-                self.lasers.clear()
-
-            if self.main_menu:
-                btn_start, btn_quit = self.draw_main_menu()
-
-            elif self.pause_menu:
-                self.draw_map()
-                self.draw_rocket()
-                self.draw_player()
-                self.draw_laser()
-
-                btn_play, btn_restart, btn_quit = self.draw_pause_menu()
-
-            elif self.game_over:
-                self.draw_map()
-                self.draw_rocket()
-                self.draw_player()
-                self.draw_laser()
-
-                btn_restart, btn_quit = self.draw_game_over_menu()
-
-            else:
-                self.draw_map()
-                self.draw_rocket()
-                self.player = self.draw_player()
-                self.draw_laser()
-
-            pygame.display.flip()
-
+        pygame.time.delay(650)
         pygame.quit()
 
 
