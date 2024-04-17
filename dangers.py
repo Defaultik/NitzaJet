@@ -14,6 +14,9 @@ class Rocket(Danger):
         super().__init__(obj, player)
 
         self.warning_counter = 0
+        self.warning_sound = False
+
+        self.fly_sound = False
 
         self.spawn_time = 0
         self.spawn_interval = random.randint(60, 300)
@@ -27,14 +30,27 @@ class Rocket(Danger):
     def draw(self):
         for rocket in self.obj.rockets:
             if rocket["warning"]:
+                if not self.warning_sound:
+                    self.warning_sound = True
+                    pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/rocket/launch.mp3"))
+
                 self.draw_warning(rocket)
             else:
+                if not self.fly_sound:
+                    self.fly_sound = True
+                    pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/rocket/fly.mp3"))
+                
                 self.draw_rocket(rocket)
 
                 if pygame.Rect.colliderect(self.sprite.rect, self.player.sprite.rect):
                     self.obj.game_over_menu.active = True
+                    self.sprite.image = Constants.ROCKET_EXPLOSION_IMAGE
+                    rocket["x"], rocket["y"] = self.player.sprite.rect.x, self.player.sprite.rect.y
 
                 if self.sprite.rect.x <= 0:
+                    self.warning_sound = False
+                    self.fly_sound = False
+
                     self.obj.rockets.remove(rocket)
                     del rocket
 
@@ -45,7 +61,7 @@ class Rocket(Danger):
         text_rect = text_surface.get_rect(center=rocket_warning.center)
         self.obj.screen.blit(text_surface, text_rect)
 
-        if not self.obj.pause_menu.active:
+        if (not self.obj.pause_menu.active) and (not self.obj.game_over_menu.active):
             if rocket["y"] > self.player.sprite.rect.y:
                 rocket["y"] -= 6
             else:
@@ -63,7 +79,7 @@ class Rocket(Danger):
 
         self.obj.screen.blit(self.sprite.image, self.sprite.rect)
 
-        if not self.obj.pause_menu.active:
+        if (not self.obj.pause_menu.active) and (not self.obj.game_over_menu.active):
             rocket["x"] -= 15 + self.obj.game_speed
 
 
@@ -82,7 +98,7 @@ class Laser(Danger):
             pygame.draw.circle(self.obj.screen, "yellow", (laser["x"], laser["y"] + laser["size"]), 15)
             pygame.draw.circle(self.obj.screen, "yellow", (laser["x"], laser["y"]), 15)
 
-            if not self.obj.pause_menu.active:
+            if (not self.obj.pause_menu.active) and (not self.obj.game_over_menu.active):
                 laser["x"] -= 7 + self.obj.game_speed
 
             if pygame.Rect.colliderect(laser_rect, self.player.sprite.rect):

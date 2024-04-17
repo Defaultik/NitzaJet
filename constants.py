@@ -6,7 +6,7 @@ pygame.init()
 WIDTH = pygame.display.Info().current_w
 HEIGHT = pygame.display.Info().current_h
 
-FPS = 60
+FPS = 45
 INIT_GAME_SPEED = 2
 
 
@@ -28,6 +28,15 @@ BACKGROUND_IMAGES = [
 ]
 
 BACKGROUND_IMAGE = BACKGROUND_IMAGES[random.randint(0, 4)]
+
+
+# QUESTIONS
+QUESTIONS = [
+    "Tuple is a data type",
+    "Pygame is not a standart Python library"
+]
+
+RANDOM_QUESTION = QUESTIONS[random.randint(0, 1)]
 
 
 # PLAYER
@@ -53,6 +62,7 @@ ROCKET_IMAGE = pygame.transform.scale(ROCKET_IMAGE, (130, 100))
 ROCKET_IMAGE = pygame.transform.rotate(ROCKET_IMAGE, 90)
 
 ROCKET_EXPLOSION_IMAGE = pygame.image.load("assets/images/explosion/2.png")
+ROCKET_EXPLOSION_IMAGE = pygame.transform.scale(ROCKET_EXPLOSION_IMAGE, (250, 250))
 
 
 # MAP

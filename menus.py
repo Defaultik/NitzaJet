@@ -39,6 +39,10 @@ class MainMenu(Menu):
         text_rect = text_surface.get_rect(center=quit_btn.center)
         self.screen.blit(text_surface, text_rect)
 
+        random_fact = Constants.FONT_MAIN.render(f'"{Constants.RANDOM_QUESTION}"', True, (100, 100, 100, 60))
+        random_fact_rect = random_fact.get_rect(center=(quit_btn.center[0], 25))
+        self.screen.blit(random_fact, random_fact_rect)
+
         return start_btn, quit_btn
 
 

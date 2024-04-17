@@ -16,6 +16,7 @@ class Game:
         self.fps = Constants.FPS
         self.game_speed = Constants.INIT_GAME_SPEED
         self.quit = False
+        self.restart = False
 
         self.screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
         self.surface = pygame.Surface((self.WIDTH, self.HEIGHT), pygame.SRCALPHA)
@@ -39,17 +40,16 @@ class Game:
             if self.rocket.spawn_time >= self.rocket.spawn_interval:
                 self.rockets.append({"x": Constants.WIDTH - 60, "y": Constants.HEIGHT / 2, "warning": True})
                 self.rocket.spawn_time = 0
-                self.rocket.spawn_interval = random.randint(60, 300)  # Generate new time
+                self.rocket.spawn_interval = random.randint(60, 220)  # Generate new time
             else:
                 self.rocket.spawn_time += 1
         
             if self.laser.spawn_time >= self.laser.spawn_interval:
                 self.lasers.append({"x": self.WIDTH, "y": random.randint(80, self.HEIGHT - 80), "size": random.randint(90, 120)})
                 self.laser.spawn_time = 0
-                self.laser.spawn_interval = random.randint(160, 550)  # Generate new time
+                self.laser.spawn_interval = random.randint(120, 360)  # Generate new time
             else:
                 self.laser.spawn_time += 1
-
 
     
     def run(self):
@@ -102,9 +102,24 @@ class Game:
                         elif quit_btn.collidepoint(event.pos):
                             self.quit = True
 
+                if self.restart:
+                    self.restart = False
+                    self.pause_menu.active = False
+                    self.game_over_menu.active = False
+
+                    self.rocket.warning_sound = False
+                    self.rocket.fly_sound = False
+                    self.rocket.sprite.image = Constants.ROCKET_IMAGE
+
+                    self.rockets.clear()
+                    self.lasers.clear()
+
                 if event.type == pygame.QUIT:
                     self.quit = True
+                    
+        pygame.mixer.Sound.play(pygame.mixer.Sound("assets/sounds/ui/quit.ogg"))
 
+        pygame.time.delay(650)
         pygame.quit()
 
 
