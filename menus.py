@@ -39,10 +39,6 @@ class MainMenu(Menu):
         text_rect = text_surface.get_rect(center=quit_btn.center)
         self.screen.blit(text_surface, text_rect)
 
-        random_fact = Constants.FONT_MAIN.render(f'"{Constants.RANDOM_QUESTION}"', True, (100, 100, 100, 60))
-        random_fact_rect = random_fact.get_rect(center=(quit_btn.center[0], 25))
-        self.screen.blit(random_fact, random_fact_rect)
-
         return start_btn, quit_btn
 
 
@@ -59,9 +55,9 @@ class PauseMenu(Menu):
         text_rect = text_surface.get_rect(center=(Constants.WIDTH / 2.05, Constants.HEIGHT / 3))
         self.screen.blit(text_surface, text_rect)
         
-        continue_btn = pygame.Rect(Constants.WIDTH / 2.5, (text_rect.y + text_rect.height) + 20, 270, 45)
+        continue_btn = pygame.Rect(Constants.WIDTH / 2.5, (text_rect.y + text_rect.height) + 15, 270, 45)
         pygame.draw.rect(self.screen, "white", continue_btn, 0, 100)
-        text_surface = Constants.FONT_MAIN.render("Play", True, "black")
+        text_surface = Constants.FONT_MAIN.render("Continue", True, "black")
         text_rect = text_surface.get_rect(center=continue_btn.center)
         self.screen.blit(text_surface, text_rect)
         
@@ -106,3 +102,36 @@ class GameOverMenu(Menu):
         self.screen.blit(text_surface, text_rect)
 
         return restart_btn, quit_btn
+    
+
+class QuestionMenu(Menu):
+    def __init__(self, screen, surface, active):
+        self.screen = screen
+        self.surface = surface
+        self.active = active
+
+
+    def draw(self):
+        self.surface.fill((10, 10, 10, 190))
+
+        question = pygame.Rect(Constants.WIDTH / 3, Constants.HEIGHT / 4, 500, 270)
+        pygame.draw.rect(self.surface, (0, 0, 0, 200), question, 0, 10)
+        text_surface = Constants.FONT_QUESTION.render(Constants.RANDOM_QUESTION, True, "white")
+        text_rect = text_surface.get_rect(center=(question.center[0], question.center[1] - 75))
+        self.surface.blit(text_surface, text_rect)
+
+        yes = pygame.Rect(question.x + 15, (question.y + question.height) - 60, 150, 50)
+        pygame.draw.rect(self.surface, (50, 250, 50, 255), yes, 0, 100)
+        text_surface = Constants.FONT_MAIN.render("True", True, "white")
+        text_rect = text_surface.get_rect(center=yes.center)
+        self.surface.blit(text_surface, text_rect)
+
+        no = pygame.Rect((question.x + question.width) - 15 - 150, (question.y + question.height) - 60, 150, 50)
+        pygame.draw.rect(self.surface, (250, 50, 50, 255), no, 0, 100)
+        text_surface = Constants.FONT_MAIN.render("False", True, "white")
+        text_rect = text_surface.get_rect(center=no.center)
+        self.surface.blit(text_surface, text_rect)
+
+        self.screen.blit(self.surface, (0, 0))
+
+        return yes, no
