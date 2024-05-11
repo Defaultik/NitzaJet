@@ -13,8 +13,6 @@ class Player:
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.mask = pygame.mask.from_surface(self.sprite.image)
 
-        self.rect = self.sprite.rect
-
         self.sprite.rect.x = 350
         self.sprite.rect.y = Constants.HEIGHT / 1.1 - Constants.FLOOR_IMAGE.get_height()
         self.y_velocity = 0
@@ -40,8 +38,7 @@ class Player:
             if self.sprite.rect.y < 53:  # Roof
                 self.sprite.rect.y = 53
                 self.y_velocity = 0
-
-            elif self.sprite.rect.y > (Constants.HEIGHT / 1.1 - Constants.FLOOR_IMAGE.get_height()):  # Floor
+            elif self.sprite.rect.y > (Constants.HEIGHT / 1.1 -Constants.FLOOR_IMAGE.get_height()):  # Floor
                 self.sprite.rect.y = Constants.HEIGHT / 1.1 - Constants.FLOOR_IMAGE.get_height()
                 self.y_velocity = 0
 
@@ -53,14 +50,8 @@ class Player:
 
             if pygame.key.get_pressed()[pygame.K_SPACE] and not self.on_ground:
                 self.sprite.image = Constants.PLAYER_FLY.convert_alpha()
-            elif self.y_velocity > 0:
-                # Falling animation
+            elif not pygame.key.get_pressed()[pygame.K_SPACE] and not self.on_ground:
                 self.sprite.image = Constants.PLAYER_FLY_STOP.convert_alpha()
-            elif not self.on_ground:
-                # Running animation
-                self.frame_count += 1
-                if self.frame_count % self.animation_speed == 0:
-                    self.sprite.image = Constants.PLAYER_MOVE_1.convert_alpha() if self.frame_count % (self.animation_speed * 2) < self.animation_speed else Constants.PLAYER_MOVE_2.convert_alpha()
             elif self.on_ground:
                 self.frame_count = 0  # Reset frame count
                 self.sprite.image = Constants.PLAYER_MOVE_1.convert_alpha()
