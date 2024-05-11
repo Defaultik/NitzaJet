@@ -19,32 +19,37 @@ class Game:
         self.quit = False
         self.restart = False
 
-        self.screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.DOUBLEBUF)
         self.surface = pygame.Surface((self.WIDTH, self.HEIGHT), pygame.SRCALPHA)
-        pygame.display.set_caption("NitzaJet | by David's team")
+        pygame.display.set_caption("NitzaJet | by David")
 
         self.main_menu = MainMenu(self.screen, self.surface, True)
         self.pause_menu = PauseMenu(self.screen, self.surface, False)
         self.game_over_menu = GameOverMenu(self.screen, self.surface, False)
         self.question_menu = QuestionMenu(self.screen, self.surface, False)
 
-        self.map = Map(self.screen)
+        self.map = Map(self)
         self.player = Player(self)
-        self.rocket = Rocket(self, self.player)
-        self.laser = Laser(self, self.player)
+
+        self.rocket = Rocket(self)
+        self.laser = Laser(self)
 
         self.rockets = []
         self.lasers = []
         self.coins = []
 
+        self.rocket_spawn_time = 0
+        self.rocket_spawn_interval = random.randint(60, 300)
+
+        self.laser_spawn_time = 0
+        self.laser_spawn_interval = random.randint(120, 300)
+
         # Initialize coin spawn time and interval
+        self.collected_coins = 0
         self.coin_spawn_time = 0
         self.coin_spawn_interval = random.randint(300, 600)
-
+        
         self.distance = 0
-        self.distance_interval = 0
-
-        self.collected_coins = 0
         self.best_distance = 0
 
         self.load_data()
@@ -54,6 +59,7 @@ class Game:
         try:
             with open("data.txt", "r") as file:
                 data = file.readlines()
+
                 if data:
                     self.best_distance = int(data[0].strip())
                     self.collected_coins = int(data[1].strip())
@@ -73,64 +79,53 @@ class Game:
 
     def dangers_generator(self):
         if (not self.game_over_menu.active) and (not self.pause_menu.active) and (not self.main_menu.active) and (not self.question_menu.active):
-            if self.rocket.spawn_time >= self.rocket.spawn_interval:
-                self.rockets.append({"x": Constants.WIDTH - 60, "y": Constants.HEIGHT / 2, "warning": True})
-                self.rocket.spawn_time = 0
-                self.rocket.spawn_interval = random.randint(60, 300)  # Generate new time
-            else:
-                self.rocket.spawn_time += 1
+            if self.rocket_spawn_time >= self.rocket_spawn_interval:
+                self.rockets.append(Rocket(self))
 
-            if self.laser.spawn_time >= self.laser.spawn_interval:
-                self.lasers.append({"x": self.WIDTH, "y": random.randint(80, self.HEIGHT - 80), "size": random.randint(90, 120)})
-                self.laser.spawn_time = 0
-                self.laser.spawn_interval = random.randint(160, 550)  # Generate new time
+                self.rocket_spawn_time = 0
+                self.rocket_spawn_interval = random.randint(60, 300)  # Generate new time
             else:
-                self.laser.spawn_time += 1
+                self.rocket_spawn_time += 1
+
+            if self.laser_spawn_time >= self.laser_spawn_interval:
+                self.lasers.append({"x": self.WIDTH, "y": random.randint(80, self.HEIGHT - 80), "size": random.randint(90, 120)})
+                self.laser_spawn_time = 0
+                self.laser_spawn_interval = random.randint(120, 300)  # Generate new time
+            else:
+                self.laser_spawn_time += 1
+
+            for rocket in self.rockets:
+                rocket.draw()
 
 
     def coin_generator(self):
-        if (not self.game_over_menu.active) and (not self.pause_menu.active) and (not self.main_menu.active) and (not self.question_menu.active):
+        if (not self.game_over_menu.active) and (not self.pause_menu.active) and (not self.main_menu.active) and (not self.question_menu.active):        
             if self.coin_spawn_time >= self.coin_spawn_interval:
-                new_coin = Coin(self, self.player, self.WIDTH, random.randint(80, self.HEIGHT - 80))
-                self.coins.append(new_coin)
+                self.coins.append(Coin(self))
 
                 self.coin_spawn_time = 0
-                self.coin_spawn_interval = random.randint(400, 800)  # Generate new interval for next spawn
+                self.coin_spawn_interval = random.randint(300, 600)  # Generate new interval for next spawn
             else:
                 self.coin_spawn_time += 1
 
+            for coin in self.coins:
+                coin.draw()
+
 
     def run(self):
+        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN])
+
         while not self.quit:
-            pygame.time.Clock().tick(self.fps)
+            self.map.draw()
+            self.player.draw()
+            self.laser.draw()
 
             self.dangers_generator()
             self.coin_generator()
 
-            self.map.draw()
-            self.player.draw()
-            self.rocket.draw()
-            self.laser.draw()
-
-            if (not self.pause_menu.active) and (not self.game_over_menu.active) and (not self.main_menu.active) and (not self.question_menu.active):
-                for coin in self.coins:
-                    coin.update()
-
-            for coin in self.coins[:]:
-                coin.draw()
-
             # Update distance
             if (not self.pause_menu.active) and (not self.game_over_menu.active) and (not self.main_menu.active) and (not self.question_menu.active):
                 self.distance += 1
-
-            # Display distance and collected coins in the top-left corner
-            distance_text = Constants.FONT_MAIN.render(f"Distance: {self.distance}", True, (255, 255, 255))
-            coins_text = Constants.FONT_MAIN.render(f"Coins: {self.collected_coins}", True, (255, 255, 255))
-            best_distance_text = Constants.FONT_MAIN.render(f"Best Distance: {self.best_distance}", True, (255, 255, 255))
-
-            self.screen.blit(distance_text, (10, 10))
-            self.screen.blit(coins_text, (10, 50))
-            self.screen.blit(best_distance_text, (10, 90))
 
             if self.main_menu.active:
                 start_btn, quit_btn = self.main_menu.draw()
@@ -141,6 +136,7 @@ class Game:
             elif self.question_menu.active:
                 true_btn, false_btn = self.question_menu.draw()
 
+            pygame.time.Clock().tick(Constants.FPS)
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -181,31 +177,32 @@ class Game:
                                 self.collected_coins += 1
                         
                         self.question_menu.active = False
-                        Constants.RANDOM_QUESTION = list(Constants.QUESTIONS.keys())[random.randint(0, 1)]
-                            
-                if self.restart:
-                    self.restart = False
-                    self.pause_menu.active = False
-                    self.game_over_menu.active = False
-                    self.question_menu.active = False
-
-                    self.distance = 0
-                    if self.distance > self.best_distance:
-                        self.best_distance = self.distance
-
-                    self.player.sprite.rect.x = 350
-                    self.player.sprite.rect.y = Constants.HEIGHT / 1.1 - Constants.FLOOR_IMAGE.get_height()
-
-                    self.rocket.warning_sound = False
-                    self.rocket.fly_sound = False
-                    self.rocket.sprite.image = Constants.ROCKET_IMAGE
-                    self.rocket.sprite.rect = self.rocket.sprite.image.get_rect()
-
-                    self.rockets.clear()
-                    self.lasers.clear()
+                        Constants.RANDOM_QUESTION = list(Constants.QUESTIONS.keys())[random.randint(0, 3)]
 
                 if event.type == pygame.QUIT:
                     self.quit = True
+                            
+            if self.restart:
+                self.restart = False
+                self.pause_menu.active = False
+                self.game_over_menu.active = False
+                self.question_menu.active = False
+
+                self.distance = 0
+                if self.distance > self.best_distance:
+                    self.best_distance = self.distance
+
+                self.player.sprite.rect.x = 350
+                self.player.sprite.rect.y = Constants.HEIGHT / 1.1 - Constants.FLOOR_IMAGE.get_height()
+
+                self.rocket.warning_sound = False
+                self.rocket.fly_sound = False
+                self.rocket.sprite.image = Constants.ROCKET_IMAGE
+                self.rocket.sprite.rect = self.rocket.sprite.image.get_rect()
+
+                self.rockets.clear()
+                self.lasers.clear()
+
 
         if self.distance > self.best_distance:
             self.best_distance = self.distance
