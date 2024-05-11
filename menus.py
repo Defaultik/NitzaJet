@@ -9,10 +9,6 @@ class Menu:
         self.active = active
 
 
-    def draw(self):
-        pass
-
-
 class MainMenu(Menu):
     def __init__(self, screen, surface, active):
         super().__init__(screen, surface, active)
@@ -34,8 +30,8 @@ class MainMenu(Menu):
         self.screen.blit(text_surface, text_rect)
         
         quit_btn = pygame.Rect(Constants.WIDTH / 2.5, start_btn.y + 60, 270, 45)
-        pygame.draw.rect(self.screen, "white", quit_btn, 0, 100)
-        text_surface = Constants.FONT_MAIN.render("Quit", True, "black")
+        pygame.draw.rect(self.screen, "crimson", quit_btn, 0, 100)
+        text_surface = Constants.FONT_MAIN.render("Quit", True, "White")
         text_rect = text_surface.get_rect(center=quit_btn.center)
         self.screen.blit(text_surface, text_rect)
 
@@ -51,7 +47,7 @@ class PauseMenu(Menu):
         self.surface.fill((10, 10, 10, 190))
         self.screen.blit(self.surface, (0, 0))
         
-        text_surface = Constants.FONT_LOGO.render("Pause", True, "white")
+        text_surface = Constants.FONT_PAUSE.render("Pause", True, "white")
         text_rect = text_surface.get_rect(center=(Constants.WIDTH / 2.05, Constants.HEIGHT / 3))
         self.screen.blit(text_surface, text_rect)
         
