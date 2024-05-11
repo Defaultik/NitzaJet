@@ -1,26 +1,28 @@
-import pygame
+import pygame, random
 import constants as Constants
 
+
 class Coin:
-    def __init__(self, obj, player, x, y):
+    def __init__(self, obj):
         self.obj = obj
-        self.player = player
+        self.player = self.obj.player
 
-        self.image = pygame.transform.scale(Constants.COIN_IMAGE, (50, 50)).convert_alpha()  # Scale the coin image
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)  # Create a mask for collision detection
+        self.sprite = pygame.sprite.Sprite()
+        self.sprite.image = pygame.transform.scale(Constants.COIN_IMAGE, (50, 50)).convert_alpha()  # Scale the coin image
 
-        self.rect.x = x
-        self.rect.y = y
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = Constants.WIDTH
+        self.sprite.rect.y = random.randint(80, Constants.HEIGHT - 80)
+
+        self.sprite.mask = pygame.mask.from_surface(self.sprite.image)  # Create a mask for collision detection
 
 
     def draw(self):
-        self.obj.screen.blit(self.image, self.rect)
+        for coin in self.obj.coins:
+            self.obj.screen.blit(self.sprite.image, self.sprite.rect)
 
+            self.sprite.rect.x -= 15 + self.obj.game_speed
 
-    def update(self):
-        self.rect.x -= 15 + self.obj.game_speed
-
-        if self.rect.colliderect(self.player.rect):
-            self.obj.coins.remove(self)
-            self.obj.question_menu.active = True
+            if pygame.Rect.colliderect(self.sprite.rect, self.player.sprite.rect):
+                self.obj.coins.remove(coin)
+                self.obj.question_menu.active = True
