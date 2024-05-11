@@ -19,7 +19,7 @@ QUESTIONS = {
     "'1.5' is int": False
 }
 
-RANDOM_QUESTION = list(QUESTIONS.keys())[random.randint(0, 1)]
+RANDOM_QUESTION = list(QUESTIONS.keys())[random.randint(0, 3)]
 
 
 # BACKGROUND
@@ -61,7 +61,7 @@ PLAYER_DEATH = pygame.transform.scale(PLAYER_DEATH, (125, 125))
 
 # ROCKET
 ROCKET_IMAGE = pygame.image.load("assets/images/rocket.png")
-ROCKET_IMAGE = pygame.transform.scale(ROCKET_IMAGE, (50, 100))
+ROCKET_IMAGE = pygame.transform.scale(ROCKET_IMAGE, (35, 100))
 ROCKET_IMAGE = pygame.transform.rotate(ROCKET_IMAGE, 90)
 
 ROCKET_EXPLOSION_IMAGE = pygame.image.load("assets/images/explosion/2.png")
@@ -69,7 +69,7 @@ ROCKET_EXPLOSION_IMAGE = pygame.transform.scale(ROCKET_EXPLOSION_IMAGE, (150, 15
 
 
 # COIN
-COIN_IMAGE = pygame.image.load("assets/images/Coin (2).png")
+COIN_IMAGE = pygame.image.load("assets/images/coin.png")
 
 
 # MAP
@@ -95,6 +95,7 @@ SOUND_UI_SELECT = "assets/sounds/ui/select.ogg"
 
 # FONTS
 FONT_LOGO = pygame.font.Font("assets/fonts/BlackHanSans-Regular.ttf", 65)
+FONT_PAUSE = pygame.font.Font("assets/fonts/BlackHanSans-Regular.ttf", 70)
 FONT_MAIN = pygame.font.Font("freesansbold.ttf", 22)
 FONT_ROCKET_WARNING = pygame.font.Font("freesansbold.ttf", 35)
 FONT_QUESTION = pygame.font.Font("assets/fonts/BlackHanSans-Regular.ttf", 20)
