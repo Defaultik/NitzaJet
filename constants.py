@@ -44,19 +44,19 @@ BACKGROUND_IMAGE = BACKGROUND_IMAGES[random.randint(0, 4)]
 
 # PLAYER
 PLAYER_MOVE_1 = pygame.image.load("assets/images/player/move_1.png")
-PLAYER_MOVE_1 = pygame.transform.scale(PLAYER_MOVE_1, (125, 125))
+PLAYER_MOVE_1 = pygame.transform.scale(PLAYER_MOVE_1, (80, 80))
 
 PLAYER_MOVE_2 = pygame.image.load("assets/images/player/move_2.png")
-PLAYER_MOVE_2 = pygame.transform.scale(PLAYER_MOVE_2, (125, 125))
+PLAYER_MOVE_2 = pygame.transform.scale(PLAYER_MOVE_2, (80, 80))
 
 PLAYER_FLY = pygame.image.load("assets/images/player/fly.png")
-PLAYER_FLY = pygame.transform.scale(PLAYER_FLY, (125, 125))
+PLAYER_FLY = pygame.transform.scale(PLAYER_FLY, (80, 80))
 
 PLAYER_FLY_STOP = pygame.image.load("assets/images/player/fly_stop.png")
-PLAYER_FLY_STOP = pygame.transform.scale(pygame.image.load("assets/images/player/fly_stop.png"), (125, 125))
+PLAYER_FLY_STOP = pygame.transform.scale(pygame.image.load("assets/images/player/fly_stop.png"), (80, 80))
 
 PLAYER_DEATH = pygame.image.load("assets/images/player/death.png")
-PLAYER_DEATH = pygame.transform.scale(PLAYER_DEATH, (125, 125))
+PLAYER_DEATH = pygame.transform.scale(PLAYER_DEATH, (80, 80))
 
 
 # ROCKET
