@@ -26,3 +26,7 @@ class Coin:
             if pygame.Rect.colliderect(self.sprite.rect, self.player.sprite.rect):
                 self.obj.coins.remove(coin)
                 self.obj.question_menu.active = True
+
+            if self.sprite.rect.x <= (0 - self.sprite.mask.get_size()[0]):
+                self.obj.coins.remove(coin)
+                del rocket
