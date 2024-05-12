@@ -12,7 +12,7 @@ class Map:
 
         for x in range(0, Constants.WIDTH, Constants.FLOOR_IMAGE.get_width()):
             self.roof = self.screen.blit(Constants.ROOF_IMAGE, (x, 0))
-            self.floor = self.screen.blit(Constants.FLOOR_IMAGE, (x, Constants.HEIGHT / 1.1))
+            self.floor = self.screen.blit(Constants.FLOOR_IMAGE, (x, Constants.HEIGHT - Constants.FLOOR_IMAGE.get_height()))
 
         # Display distance and collected coins in the top-left corner
         coins_text = Constants.FONT_MAIN.render(f"Coins: {self.obj.collected_coins}", True, (255, 255, 255))
