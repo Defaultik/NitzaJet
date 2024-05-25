@@ -8,7 +8,7 @@ class Coin:
         self.player = self.obj.player
 
         self.sprite = pygame.sprite.Sprite()
-        self.sprite.image = pygame.transform.scale(Constants.COIN_IMAGE, (50, 50)).convert_alpha()  # Scale the coin image
+        self.sprite.image = Constants.COIN_IMAGE.convert_alpha() 
 
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = Constants.WIDTH
