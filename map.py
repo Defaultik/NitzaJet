@@ -15,11 +15,9 @@ class Map:
             self.floor = self.screen.blit(Constants.FLOOR_IMAGE, (x, Constants.HEIGHT - Constants.FLOOR_IMAGE.get_height()))
 
         # Display distance and collected coins in the top-left corner
-        coins_text = Constants.FONT_MAIN.render(f"Coins: {self.obj.collected_coins}", True, (255, 255, 255))
-        self.screen.blit(coins_text, (10, 10))
+        coin_image = self.screen.blit(Constants.COIN_IMAGE, (10, 10))
+        coins_text = Constants.FONT_MAIN.render(str(self.obj.collected_coins), True, (255, 255, 255))
+        coins_text_pos = self.screen.blit(coins_text, (coin_image.x + 45, coin_image.y * 2))
 
-        distance_text = Constants.FONT_MAIN.render(f"Distance: {self.obj.distance}", True, (255, 255, 255))
-        self.screen.blit(distance_text, (10, 50))
-
-        best_distance_text = Constants.FONT_MAIN.render(f"Best Distance: {self.obj.best_distance}", True, (255, 255, 255))
-        self.screen.blit(best_distance_text, (10, 90))
+        distance_text = Constants.FONT_MAIN.render(str(self.obj.distance) + "m", True, (255, 255, 255))
+        distance_text_pos = self.screen.blit(distance_text, (Constants.WIDTH / 2.1, 15))
