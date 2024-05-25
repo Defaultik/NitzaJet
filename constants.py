@@ -61,7 +61,7 @@ PLAYER_DEATH = pygame.transform.scale(PLAYER_DEATH, (80, 80))
 
 # ROCKET
 ROCKET_IMAGE = pygame.image.load("assets/images/rocket.png")
-ROCKET_IMAGE = pygame.transform.scale(ROCKET_IMAGE, (35, 100))
+ROCKET_IMAGE = pygame.transform.scale(ROCKET_IMAGE, (30, 115))
 ROCKET_IMAGE = pygame.transform.rotate(ROCKET_IMAGE, 90)
 
 ROCKET_EXPLOSION_IMAGE = pygame.image.load("assets/images/explosion/2.png")
@@ -70,6 +70,7 @@ ROCKET_EXPLOSION_IMAGE = pygame.transform.scale(ROCKET_EXPLOSION_IMAGE, (150, 15
 
 # COIN
 COIN_IMAGE = pygame.image.load("assets/images/coin.png")
+COIN_IMAGE = pygame.transform.scale(COIN_IMAGE, (40, 40))
 
 
 # MAP
